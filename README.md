@@ -1,2 +1,2 @@
 # neural_networks_seminar
-Seminar project for sequence 2 sequence learning neural networks seminar. Summer semester 2023
+GitHub repository for the seminar project in "sequence 2 sequence learning neural networks" during the summer semester 2023.
