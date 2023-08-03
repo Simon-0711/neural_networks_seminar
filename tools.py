@@ -20,7 +20,7 @@ from constants import (suffix_cropped_images, suffix_cropped_json,
 from PIL import Image, ImageDraw, ImageFont
 from tenacity import retry, wait_fixed
 
-def explore_image(img_id, base_path):
+def explore_image(img_id, base_path, return_only_json=False):
     data_path = base_path + "nutrition-lc-fr-country-fr-last-edit-date-2019-08/"
     cropped_imgs_path = base_path + "cropped_images/"
     imgs_path = base_path + "image_files/"
@@ -39,6 +39,10 @@ def explore_image(img_id, base_path):
     
     with open(json_file_path) as f:
         json_file = json.load(f)
+
+        # Added option to only return json file
+        if return_only_json:
+            return json_file
         
     with open(cropped_json_file_path) as cf:
         cropped_json_file = json.load(cf)
