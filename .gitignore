@@ -167,3 +167,13 @@ cython_debug/
 
 # Data
 data/**
+
+
+.env
+# Ignore downloaded training data
+data/
+pubtabnet.tar
+pubtabnet/**
+
+# Ignore local py venv
+s2s/**
