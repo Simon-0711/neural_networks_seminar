@@ -167,3 +167,12 @@ cython_debug/
 
 # Data
 data/**
+
+# Ignore all data directories
+pubtabnet/**
+pubtabnet.tar
+arial.ttf
+cropped_images/
+cropped_json_files/
+image_files/
+json_files/
