@@ -1,5 +1,5 @@
 import torch
-from data.dataset import lmdbDataset, resizeNormalize
+from dataset import lmdbDataset, resizeNormalize
 import pickle as pkl
 
 global alp2num_character, alphabet_character, alp2num_radical, alphabet_radical, char2radicals
