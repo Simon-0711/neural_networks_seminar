@@ -57,10 +57,10 @@ def tree_edit_distance(table1_html, table2_html):
 
     # Calculate the TED score according to the paper: https://arxiv.org/pdf/1911.10683.pdf
 
-    maxDist = max(get_tree_size(zss_tree1), get_tree_size(zss_tree2))
-    print(maxDist)
+    max_dist = max(get_tree_size(zss_tree1), get_tree_size(zss_tree2))
+    print(max_dist)
 
-    ted_score = 1 - (simple_distance(zss_tree1, zss_tree2) / maxDist)
+    ted_score = 1 - (simple_distance(zss_tree1, zss_tree2) / max_dist)
 
     return ted_score
 
