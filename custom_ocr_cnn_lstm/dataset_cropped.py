@@ -4,6 +4,7 @@ import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
+import json
 
 class OCRDatasetCropped(Dataset):
     def __init__(self, labels_dir, image_dir, transform=None):
@@ -17,20 +18,18 @@ class OCRDatasetCropped(Dataset):
         return len(self.labels)
 
     def __getitem__(self, idx):
-        img_filename = list(self.labels.keys())[idx]
-        crop_info = self.labels[img_filename]['html']['cells'][0]['bbox']  # Assuming the first bounding box contains crop info
-        crop_info = "_".join(map(str, crop_info))  # Convert the crop info to a string
-        img_filename = img_filename.split(".")[0]  # Remove the file extension
-        img_filename = f"{img_filename}_bbox_{crop_info}.png"  # Construct the new img_filename
-        img_path = os.path.join(self.base_path, self.labels[img_filename]['split'], img_filename)
+        # Get all filenames form list of labels
+        labels = list(self.labels)
+        # Get filename from list of labels
+        img_filename = labels[idx]["filename"]
+        # img_filename = list(self.labels["filename"])[idx]
+        img_path = os.path.join(self.image_dir, img_filename)
         image = Image.open(img_path).convert('RGB')
 
         if self.transform:
             image = self.transform(image)
 
-        label = self.labels[img_filename]
-
-        return label, image
+        return image, self.labels[idx]
 
     def load_labels(self, labels_file):
         with open(labels_file, 'r') as f:
