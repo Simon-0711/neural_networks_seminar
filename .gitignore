@@ -168,11 +168,20 @@ cython_debug/
 # Data
 data/**
 
-# Ignore all data directories
-pubtabnet/**
+
+.env
+# Ignore downloaded training data
+data/
 pubtabnet.tar
-arial.ttf
-cropped_images/
-cropped_json_files/
-image_files/
-json_files/
+pubtabnet/**
+
+# Ignore local py venv
+s2s/**
+
+# Ignore safed files
+history/**
+
+# Ignore model checkpoints and pth files
+checkpoints/**
+model.pth
+.pth
