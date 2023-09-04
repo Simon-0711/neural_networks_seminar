@@ -30,7 +30,7 @@ class OCRDatasetCropped(Dataset):
             image = self.transform(image)
         labels = self.labels[idx]["tokens"]
 
-        item = {'idx': idx, 'label': labels, 'image':image}
+        item = {'idx': idx, 'label': " ".join(labels), 'image':image}
         return item
         
 

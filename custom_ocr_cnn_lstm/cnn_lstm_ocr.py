@@ -9,11 +9,12 @@ class CNN_Encoder(nn.Module):
         self.output_dim = params["output_dim"]
         self.input_planes = params["input_planes"]
         self.planes = params["planes"]
+        self.max_width = params["max_width"]  # Add this parameter
 
         # Define the CNN layers
         # Use 1x1 convolutions for the remaining layers
-        self.conv_layer_1 = nn.Conv2d(self.input_planes, self.planes, kernel_size=1, stride=1, padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(self.planes)
+        self.conv_layer_1 = nn.Conv2d(self.input_planes, 1, kernel_size=1, stride=1, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(1)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool_1 = nn.MaxPool2d(kernel_size=2, stride=2)
         # Use 3x3 convolutions for the remaining layers
