@@ -185,3 +185,10 @@ history/**
 checkpoints/**
 model.pth
 .pth
+!/Icon**
+!/data_exploration/Icon**
+!/model_exploration/easy_ocr/Icon**
+!/model_exploration/Icon**
+!/model_exploration/test_images/Icon**
+!/model_exploration/transformer_ocr_microsoft/Icon**
+
