@@ -30,11 +30,9 @@ class OCRDatasetCropped(Dataset):
             image = self.transform(image)
         labels = self.labels[idx]["tokens"]
 
-        if len(labels) > 0 and image.size(0) > 0 and image.size(1) > 0:
-            return image, labels
-        else:
-            # Throw error
-            print("Error: Image size is 0")
+        item = {'idx': idx, 'label': labels, 'image':image}
+        return item
+        
 
     def load_labels(self, labels_file):
         with open(labels_file, 'r') as f:
