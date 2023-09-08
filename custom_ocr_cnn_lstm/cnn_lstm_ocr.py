@@ -76,11 +76,13 @@ class CNNLSTM_OCR(nn.Module):
         out = self.cnn_encoder(x)
 
         b, c, h, w = out.size()
+        print(b, c, h, w)
         assert h == 1, "the height of cnn must be 1"
         # remove all dimensions of size 1
         out = out.squeeze(2)
         out = out.permute(2, 0, 1)  # [w, b, c]
-
+        b, c, h, w = out.size()
+        print(b, c, h, w)
         # Apply the LSTM decoder
         out = self.lstm_decoder(out)
         return out
