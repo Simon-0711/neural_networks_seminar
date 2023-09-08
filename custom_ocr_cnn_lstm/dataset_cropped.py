@@ -6,13 +6,13 @@ from torchvision import transforms
 from PIL import Image
 import json
 
+
 class OCRDatasetCropped(Dataset):
     def __init__(self, labels_dir, image_dir, transform=None):
         self.transform = transform
         self.labels_dir = labels_dir
         self.image_dir = image_dir
         self.labels = self.load_labels(labels_dir)
-        
 
     def __len__(self):
         return len(self.labels)
@@ -24,17 +24,16 @@ class OCRDatasetCropped(Dataset):
         img_filename = labels[idx]["filename"]
         # img_filename = list(self.labels["filename"])[idx]
         img_path = os.path.join(self.image_dir, img_filename)
-        image = Image.open(img_path).convert('RGB')
+        image = Image.open(img_path).convert("RGB")
         # print("Image size: ", image.size)
         if self.transform:
             image = self.transform(image)
         labels = self.labels[idx]["tokens"]
 
-        item = {'idx': idx, 'label': " ".join(labels), 'image':image}
+        item = {"idx": idx, "label": " ".join(labels), "image": image}
         return item
-        
 
     def load_labels(self, labels_file):
-        with open(labels_file, 'r') as f:
+        with open(labels_file, "r") as f:
             labels = json.load(f)
         return labels
