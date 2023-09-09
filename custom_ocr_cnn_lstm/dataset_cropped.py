@@ -6,6 +6,8 @@ from torchvision import transforms
 from PIL import Image
 import json
 
+from custom_ocr_cnn_lstm.utils import remove_xml_tags
+
 
 class OCRDatasetCropped(Dataset):
     def __init__(self, labels_dir, image_dir, transform=None):
@@ -29,8 +31,8 @@ class OCRDatasetCropped(Dataset):
         if self.transform:
             image = self.transform(image)
         labels = self.labels[idx]["tokens"]
-
-        item = {"idx": idx, "label": " ".join(labels), "image": image}
+        labels = remove_xml_tags("".join(labels))
+        item = {"idx": idx, "label": labels, "image": image}
         return item
 
     def load_labels(self, labels_file):

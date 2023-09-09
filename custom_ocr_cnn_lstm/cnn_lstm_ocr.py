@@ -55,7 +55,7 @@ class CNN_Encoder(nn.Module):
         out = out.view(
             out.shape[0], out.shape[1], 1, original_height * original_width
         )
-        print(out.shape)
+        print("Out shape: ", out.shape)
         return out
 
 
@@ -74,16 +74,23 @@ class LSTM_Decoder(nn.Module):
 
     def forward(self, x):
         # Apply the LSTM layers
-        output = self.lstm(x)
-        output = output.transpose(1, 0)  # Tbh to bth
-        return output
+        # output = self.lstm(x)
+        # output = output.transpose(1, 0)  # Tbh to bth
+        # return output
 
+        self.lstm.flatten_parameters()
+        recurrent, _ = self.lstm(x)
+        T, b, h = recurrent.size()
+        t_rec = recurrent.view(T * b, h)
+        output = self.embedding(t_rec)  # [T * b, nOut]
+        output = output.view(T, b, -1)
+        return output
 
 class CNNLSTM_OCR(nn.Module):
     def __init__(self, params):
         super(CNNLSTM_OCR, self).__init__()
         self.cnn_encoder = CNN_Encoder(params)
-        params["input_dim"] = self.cnn_encoder.output_dim
+        params["input_dim"] = 32
         self.lstm_decoder = LSTM_Decoder(params)
 
     def forward(self, x):
@@ -98,4 +105,5 @@ class CNNLSTM_OCR(nn.Module):
         out = out.permute(2, 0, 1)  # [w, b, c]
         # Apply the LSTM decoder
         out = self.lstm_decoder(out)
+        out = out.transpose(1, 0)  # [b, w, c]
         return out
