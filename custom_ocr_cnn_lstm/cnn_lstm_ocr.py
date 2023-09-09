@@ -14,15 +14,20 @@ class CNN_Encoder(nn.Module):
         # Define the CNN layers
         # Use 1x1 convolutions for the remaining layers
         self.conv_layer_1 = nn.Conv2d(
-            self.input_planes, 1, kernel_size=1, stride=1, padding=1, bias=False
+            in_channels=self.input_planes,
+            out_channels=1,
+            kernel_size=1,
+            stride=1,
+            padding=1,
+            bias=False,
         )
         self.bn1 = nn.BatchNorm2d(1)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool_1 = nn.MaxPool2d(kernel_size=2, stride=2)
         # Use 3x3 convolutions for the remaining layers
         self.conv_layer_2 = nn.Conv2d(
-            self.input_planes,
-            self.planes,
+            in_channels=self.input_planes,
+            out_channels=self.planes,
             kernel_size=3,
             stride=1,
             padding=1,
@@ -32,8 +37,10 @@ class CNN_Encoder(nn.Module):
         self.maxpool_2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
     def forward(self, x):
+        print("cnn input x.shape:", x.shape)
         # Apply the CNN layers
         out = self.conv_layer_1(x)
+        print(self.conv_layer_1)
         out = self.bn1(out)
         out = self.relu(out)
         out = self.maxpool_1(out)
@@ -41,6 +48,14 @@ class CNN_Encoder(nn.Module):
         out = self.bn2(out)
         out = self.relu(out)
         out = self.maxpool_2(out)
+
+        # Get the original height and width
+        original_height, original_width = out.shape[2], out.shape[3]
+        # Reshape the tensor
+        out = out.view(
+            out.shape[0], out.shape[1], 1, original_height * original_width
+        )
+        print(out.shape)
         return out
 
 
@@ -76,13 +91,11 @@ class CNNLSTM_OCR(nn.Module):
         out = self.cnn_encoder(x)
 
         b, c, h, w = out.size()
-        print(b, c, h, w)
+        print(f"cnn out.size(): {b}, {c}, {h}, {w}")
         assert h == 1, "the height of cnn must be 1"
         # remove all dimensions of size 1
         out = out.squeeze(2)
         out = out.permute(2, 0, 1)  # [w, b, c]
-        b, c, h, w = out.size()
-        print(b, c, h, w)
         # Apply the LSTM decoder
         out = self.lstm_decoder(out)
         return out
