@@ -40,7 +40,6 @@ class CNN_Encoder(nn.Module):
         print("cnn input x.shape:", x.shape)
         # Apply the CNN layers
         out = self.conv_layer_1(x)
-        print(self.conv_layer_1)
         out = self.bn1(out)
         out = self.relu(out)
         out = self.maxpool_1(out)
@@ -55,7 +54,6 @@ class CNN_Encoder(nn.Module):
         out = out.view(
             out.shape[0], out.shape[1], 1, original_height * original_width
         )
-        print("Out shape: ", out.shape)
         return out
 
 
@@ -64,25 +62,22 @@ class LSTM_Decoder(nn.Module):
         super(LSTM_Decoder, self).__init__()
         self.input_dim = params["input_dim"]
         self.hidden_dim = params["hidden_dim"]
-        self.output_dim = params["output_dim"]
+        self.output_dim = params["output_dim"] # Alphabet size
 
         # Define the LSTM layers
         self.lstm = nn.LSTM(self.input_dim, self.hidden_dim, bidirectional=True)
         self.embedding = nn.Linear(self.hidden_dim * 2, self.output_dim)
 
-        print(self.lstm)
-
     def forward(self, x):
-        # Apply the LSTM layers
-        # output = self.lstm(x)
-        # output = output.transpose(1, 0)  # Tbh to bth
-        # return output
-
         self.lstm.flatten_parameters()
-        recurrent, _ = self.lstm(x)
-        T, b, h = recurrent.size()
-        t_rec = recurrent.view(T * b, h)
-        output = self.embedding(t_rec)  # [T * b, nOut]
+        # input dimensions of x: (sequence_length, batch_size, input_dim)
+        output, _ = self.lstm(x)
+
+        # T = length sequence, b = batch size, h = hidden size
+        T, b, h = output.size()
+        # flattens the batch dimension
+        output = self.embedding(output.view(T * b, h))
+        # (sequence_length, batch_size, alphabet_size)
         output = output.view(T, b, -1)
         return output
 
