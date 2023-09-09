@@ -106,4 +106,5 @@ class CNNLSTM_OCR(nn.Module):
         # Apply the LSTM decoder
         out = self.lstm_decoder(out)
         out = out.transpose(1, 0)  # [b, w, c]
+        print(out[1])
         return out
