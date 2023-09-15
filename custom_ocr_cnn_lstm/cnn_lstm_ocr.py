@@ -37,7 +37,7 @@ class CNN_Encoder(nn.Module):
         self.maxpool_2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
     def forward(self, x):
-        print("cnn input x.shape:", x.shape)
+        #print("cnn input x.shape:", x.shape)
         # Apply the CNN layers
         out = self.conv_layer_1(x)
         out = self.bn1(out)
@@ -93,7 +93,7 @@ class CNNLSTM_OCR(nn.Module):
         out = self.cnn_encoder(x)
 
         b, c, h, w = out.size()
-        print(f"cnn out.size(): {b}, {c}, {h}, {w}")
+        #print(f"cnn out.size(): {b}, {c}, {h}, {w}")
         assert h == 1, "the height of cnn must be 1"
         # remove all dimensions of size 1
         out = out.squeeze(2)
@@ -101,5 +101,5 @@ class CNNLSTM_OCR(nn.Module):
         # Apply the LSTM decoder
         out = self.lstm_decoder(out)
         out = out.transpose(1, 0)  # [b, w, c]
-        print(out[1])
+        #print(out[1])
         return out
