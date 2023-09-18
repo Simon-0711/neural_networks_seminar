@@ -6,7 +6,7 @@ from torchvision import transforms
 from PIL import Image
 import json
 
-from custom_ocr_cnn_lstm.utils import remove_xml_tags
+from utils import remove_xml_tags
 
 
 class OCRDatasetCropped(Dataset):

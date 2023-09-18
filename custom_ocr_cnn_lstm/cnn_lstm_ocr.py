@@ -35,7 +35,7 @@ class CNN_Encoder(nn.Module):
         )
         self.bn2 = nn.BatchNorm2d(self.planes)
         self.maxpool_2 = nn.MaxPool2d(kernel_size=2, stride=2)
-
+        
     def forward(self, x):
         print("cnn input x.shape:", x.shape)
         # Apply the CNN layers
