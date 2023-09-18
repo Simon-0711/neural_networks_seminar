@@ -35,9 +35,9 @@ class CNN_Encoder(nn.Module):
         )
         self.bn2 = nn.BatchNorm2d(self.planes)
         self.maxpool_2 = nn.MaxPool2d(kernel_size=2, stride=2)
-        
+
     def forward(self, x):
-        print("cnn input x.shape:", x.shape)
+        # print("cnn input x.shape:", x.shape)
         # Apply the CNN layers
         out = self.conv_layer_1(x)
         out = self.bn1(out)
@@ -51,9 +51,7 @@ class CNN_Encoder(nn.Module):
         # Get the original height and width
         original_height, original_width = out.shape[2], out.shape[3]
         # Reshape the tensor
-        out = out.view(
-            out.shape[0], out.shape[1], 1, original_height * original_width
-        )
+        out = out.view(out.shape[0], out.shape[1], 1, original_height * original_width)
         return out
 
 
@@ -62,7 +60,7 @@ class LSTM_Decoder(nn.Module):
         super(LSTM_Decoder, self).__init__()
         self.input_dim = params["input_dim"]
         self.hidden_dim = params["hidden_dim"]
-        self.output_dim = params["output_dim"] # Alphabet size
+        self.output_dim = params["output_dim"]  # Alphabet size
 
         # Define the LSTM layers
         self.lstm = nn.LSTM(self.input_dim, self.hidden_dim, bidirectional=True)
@@ -75,11 +73,13 @@ class LSTM_Decoder(nn.Module):
 
         # T = length sequence, b = batch size, h = hidden size
         T, b, h = output.size()
+        # print(f"T: {T}")
         # flattens the batch dimension
         output = self.embedding(output.view(T * b, h))
         # (sequence_length, batch_size, alphabet_size)
         output = output.view(T, b, -1)
         return output
+
 
 class CNNLSTM_OCR(nn.Module):
     def __init__(self, params):
@@ -93,7 +93,7 @@ class CNNLSTM_OCR(nn.Module):
         out = self.cnn_encoder(x)
 
         b, c, h, w = out.size()
-        print(f"cnn out.size(): {b}, {c}, {h}, {w}")
+        # print(f"cnn out.size(): {b}, {c}, {h}, {w}")
         assert h == 1, "the height of cnn must be 1"
         # remove all dimensions of size 1
         out = out.squeeze(2)
@@ -101,5 +101,4 @@ class CNNLSTM_OCR(nn.Module):
         # Apply the LSTM decoder
         out = self.lstm_decoder(out)
         out = out.transpose(1, 0)  # [b, w, c]
-        print(out[1])
         return out
