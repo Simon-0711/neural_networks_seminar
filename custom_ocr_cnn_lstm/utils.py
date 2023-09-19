@@ -18,6 +18,7 @@ import math
 from warnings import warn
 import re
 import string
+from textdistance import levenshtein as lev
 
 class OCRLabelConverter(object):
     """Convert between str and label.
@@ -122,3 +123,66 @@ import re
 def remove_xml_tags(input_string):
     pattern = r'<[^>]+>'
     return re.sub(pattern, '', input_string)
+
+class Eval:
+    def _blanks(self, max_vals,  max_indices):
+        def get_ind(indices):
+            result = []
+            for i in range(len(indices)):
+                if indices[i] != 0:
+                    result.append(i)
+            return result
+        non_blank = list(map(get_ind, max_indices))
+        scores = []
+
+        for i, sub_list in enumerate(non_blank):
+            sub_val = []
+            if sub_list:
+                for item in sub_list:
+                    sub_val.append(max_vals[i][item])
+            score = np.exp(np.sum(sub_val))
+            if math.isnan(score):
+                score = 0.0
+            scores.append(score)
+        return scores
+
+
+    def _clean(self, word):
+        regex = re.compile('[%s]' % re.escape('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~“”„'))
+        return regex.sub('', word)
+
+    def char_accuracy(self, pair):
+        words, truths = pair
+        words, truths = ''.join(words), ''.join(truths)
+        sum_edit_dists = lev.distance(words, truths)
+        sum_gt_lengths = sum(map(len, truths))
+        fraction = 0
+        if sum_gt_lengths != 0:
+            fraction = sum_edit_dists / sum_gt_lengths
+
+        percent = fraction * 100
+        if 100.0 - percent < 0:
+            return 0.0
+        else:
+            return 100.0 - percent
+
+    def word_accuracy(self, pair):
+        correct = 0
+        word, truth = pair
+        if self._clean(word) == self._clean(truth):
+            correct = 1
+        return correct
+
+    def format_target(self, target, target_sizes):
+        target_ = []
+        start = 0
+        for size_ in target_sizes:
+            target_.append(target[start:start + size_])
+            start += size_
+        return target_
+
+    def word_accuracy_line(self, pairs):
+        preds, truths = pairs
+        word_pairs = text_align(preds.split(), truths.split())
+        word_acc = np.mean((list(map(self.word_accuracy, word_pairs))))
+        return word_acc
