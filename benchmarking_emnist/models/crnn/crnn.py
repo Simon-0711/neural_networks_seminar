@@ -15,7 +15,6 @@ class CRNN(nn.Module):
         self.norm4 = nn.InstanceNorm2d(64)
         self.gru_input_size = cnn_output_height * 64
         self.gru = nn.GRU(self.gru_input_size, gru_hidden_size, gru_num_layers, batch_first=True, bidirectional=True)
-        # self.lstm = nn.LSTM(self.gru_input_size, gru_hidden_size, gru_num_layers, batch_first=True, bidirectional=True)
         self.fc = nn.Linear(gru_hidden_size * 2, num_classes)
 
     def forward(self, x):

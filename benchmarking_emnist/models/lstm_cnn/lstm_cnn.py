@@ -4,7 +4,7 @@ import torch.nn.functional as F
 class CNN_LSTM(nn.Module):
 
     def __init__(self, gru_hidden_size=256, gru_num_layers=2, num_classes=62, cnn_output_height=1):
-        super(CRNN, self).__init__()
+        super(CNN_LSTM, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, kernel_size=(3, 3))
         self.norm1 = nn.InstanceNorm2d(32)
         self.conv2 = nn.Conv2d(32, 32, kernel_size=(3, 3), stride=2)
