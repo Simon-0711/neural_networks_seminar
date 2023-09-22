@@ -75,8 +75,8 @@ class Trainer:
                         val_correct += 1
                     val_total += 1
 
-        self.metrics["val_accuracy"].append(val_accuracy)
         val_accuracy = val_correct / val_total
+        self.metrics["val_accuracy"].append(val_accuracy)
         print(f'EPOCH {epoch + 1}/{self.epochs} - TESTING. Correct: {val_correct}/{val_total} = {val_accuracy:.4f}')
 
     def train_validate_test(self):
