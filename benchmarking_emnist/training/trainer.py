@@ -13,6 +13,12 @@ class Trainer:
         self.val_loader = val_loader
         self.epochs = epochs
         self.args = args
+        self.metrics = {
+            "train_loss": [],
+            "train_accuracy": [],
+            "val_loss": [],
+            "val_accuracy": []
+        }
 
     def train(self, epoch):
         # Training
@@ -41,6 +47,8 @@ class Trainer:
                 train_total += 1
 
         train_accuracy = train_correct / train_total
+        self.metrics["train_loss"].append(loss.item())
+        self.metrics["train_accuracy"].append(train_accuracy)
         print(f'EPOCH {epoch + 1}/{self.epochs} - TRAINING. Correct: {train_correct}/{train_total} = {train_accuracy:.4f}')
 
     def validate(self, epoch):
@@ -67,10 +75,11 @@ class Trainer:
                         val_correct += 1
                     val_total += 1
 
+        self.metrics["val_accuracy"].append(val_accuracy)
         val_accuracy = val_correct / val_total
         print(f'EPOCH {epoch + 1}/{self.epochs} - TESTING. Correct: {val_correct}/{val_total} = {val_accuracy:.4f}')
 
-    def train_and_validate(self):
+    def train_validate_test(self):
         for epoch in range(self.epochs):
             self.train(epoch)
             self.validate(epoch)
