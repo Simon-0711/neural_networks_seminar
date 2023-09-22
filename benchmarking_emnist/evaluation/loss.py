@@ -4,7 +4,7 @@ import numpy as np
 from evaluations_utils import create_directory_if_not_exists, round_to_nearest_multiple
 
 
-def plot_loss(model_name: str, loss_per_epoch: list, figure_evaluation_dir):
+def plot_loss(model_name: str, loss_per_epoch: list, figure_evaluation_dir=None):
     """
     Plots the loss per epoch for a given model.
 
@@ -23,6 +23,10 @@ def plot_loss(model_name: str, loss_per_epoch: list, figure_evaluation_dir):
         >>> plot_loss("MyModel", [0.1, 0.05, 0.02, 0.01], "/path/to/save")
 
     """
+    if figure_evaluation_dir is None:
+        figure_evaluation_dir = (
+            f"neural_networks_seminar/benchmarking_emnist/models/{model_name}/"
+        )
     # Create dir if it doesn't exist
     create_directory_if_not_exists(figure_evaluation_dir)
 
@@ -53,16 +57,12 @@ def plot_loss(model_name: str, loss_per_epoch: list, figure_evaluation_dir):
     plt.legend(loc="best")
 
     # Save the plot
-    plot_path = f"{figure_evaluation_dir}/{model_name}_loss.png"
+    plot_path = f"{figure_evaluation_dir}{model_name}_loss.png"
     plt.savefig(plot_path)
     plt.clf()
 
 
-num_epochs = 100
-loss_values = np.logspace(0, -3, num=num_epochs) + np.random.normal(0, 0.05, num_epochs)
+# num_epochs = 100
+# loss_values = np.logspace(0, -3, num=num_epochs) + np.random.normal(0, 0.05, num_epochs)
 
-plot_loss(
-    "GRNN",
-    loss_values,
-    "/Users/simon/Documents/neural_networks_ocr_project/neural_networks_seminar/benchmarking_emnist/models/crnn",
-)
+# plot_loss("crnn", loss_values)
