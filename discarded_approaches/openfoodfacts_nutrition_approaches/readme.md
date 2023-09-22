@@ -1,0 +1,2 @@
+# General Information
+The approaches found in this directory were mainly based on the open food facts data of french nutrition labels. Additional information about the project can be found here: https://github.com/openfoodfacts/off-nutrition-table-extractor. Additional information about the used data can be found here: https://github.com/openfoodfacts/openfoodfacts-ai/blob/develop/data-sets.md. 

@@ -1,0 +1,2 @@
+# General Information
+The approaches found in this directory were based on the PubTabNet dataset (https://paperswithcode.com/dataset/pubtabnet) which is used for many OCR Table extraction tasks. We tried to implement an OCR model based on cropped table images and connect the OCR results with table generation results based on TEDS, CTC and CER metrics. 
