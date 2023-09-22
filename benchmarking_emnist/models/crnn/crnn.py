@@ -33,6 +33,6 @@ class CRNN(nn.Module):
         out = F.leaky_relu(out)
         out = out.permute(0, 3, 2, 1)
         out = out.reshape(batch_size, -1, self.gru_input_size)
-        out, _ = self.lstm(out)
+        out, _ = self.gru(out)
         out = torch.stack([F.log_softmax(self.fc(out[i]), dim=-1) for i in range(out.shape[0])])
         return out
