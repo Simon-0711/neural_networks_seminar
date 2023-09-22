@@ -167,7 +167,8 @@ cython_debug/
 
 # Data
 data/**
-
+EMNIST/**
+benchmarking_emnist/EMNIST/**
 
 .env
 # Ignore downloaded training data
