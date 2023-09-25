@@ -185,5 +185,3 @@ history/**
 
 # Ignore model checkpoints and pth files
 checkpoints/**
-model.pth
-.pth

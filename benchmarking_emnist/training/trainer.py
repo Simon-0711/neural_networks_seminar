@@ -27,6 +27,8 @@ class Trainer:
         self.cer = CharErrorRate()
         self.all_train_cers = []
         self.all_val_cers = []
+        self.epoch_train_cers = []
+        self.epoch_val_cers = []
 
     def train(self, epoch):
         # Training
@@ -84,6 +86,8 @@ class Trainer:
                 train_total += 1
 
         train_accuracy = train_correct / train_total
+        # Add CER for epoch
+        self.epoch_train_cers.append(round(np.mean(np.array(self.all_train_cers)), 3))
         self.metrics["train_loss"].append(loss.item())
         self.metrics["train_accuracy"].append(train_accuracy)
         print(
@@ -144,6 +148,8 @@ class Trainer:
                     val_total += 1
 
         val_accuracy = val_correct / val_total
+        # Add CER for epoch
+        self.epoch_val_cers.append(round(np.mean(np.array(self.all_val_cers)), 3))
         self.metrics["val_accuracy"].append(val_accuracy)
         print(
             f"EPOCH {epoch + 1}/{self.epochs} - TESTING. Correct: {val_correct}/{val_total} = {val_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
