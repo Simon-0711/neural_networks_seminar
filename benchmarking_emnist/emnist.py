@@ -59,11 +59,13 @@ def get_emnist_data_loaders():
     emnist_dataset = EMNISTDataset(hp.NUMBER_OF_SEQUENCES, hp.DIGITS_PER_SEQUENCE)
 
     # Split the dataset into train and validation sets
-    train_size = int(0.8 * len(emnist_dataset))
-    val_size = len(emnist_dataset) - train_size
-    train_set, val_set = random_split(emnist_dataset, [train_size, val_size])
+    train_size = int(0.7 * len(emnist_dataset))
+    val_size = int(len(emnist_dataset) - train_size - 0.1)
+    test_size = int(len(emnist_dataset) - train_size - val_size)
+    train_set, val_set, test_set = random_split(emnist_dataset, [train_size, val_size, test_size])
 
     # Create data loaders
     train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
     val_loader = DataLoader(val_set, batch_size=1, shuffle=True)
-    return train_loader, val_loader
+    test_loader = DataLoader(test_set, batch_size=1, shuffle=True)
+    return train_loader, val_loader, test_loader
