@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 class Trainer:
     def __init__(
-        self, model, criterion, optimizer, train_loader, val_loader, test_loader, epochs, args, model_path=None
+        self, model, model_name, criterion, optimizer, train_loader, val_loader, test_loader, epochs, args, scheduler=None, model_path=None
     ):
         self.model = model
         self.criterion = criterion
@@ -20,6 +20,8 @@ class Trainer:
         self.val_loader = val_loader
         self.test_loader = test_loader
         self.epochs = epochs
+        self.scheduler = scheduler
+
         self.args = args
         if model_path is not None:
             self.model.load_state_dict(torch.load(model_path))
@@ -33,8 +35,10 @@ class Trainer:
         self.cer = CharErrorRate()
         self.all_train_cers = []
         self.all_val_cers = []
+        self.all_test_cers = []
         self.epoch_train_cers = []
         self.epoch_val_cers = []
+        self.epoch_test_cers = []
 
     def load_model(self, model_path):
         self.model.load_state_dict(torch.load(model_path))
@@ -63,9 +67,11 @@ class Trainer:
             loss = self.criterion(y_pred, y_train, input_lengths, target_lengths)
             loss.backward()
             self.optimizer.step()
-            train_correct_incr, train_total_incr = self.get_batch_cers(y_pred, y_train, batch_size)
+            train_correct_incr, train_total_incr = self.get_batch_cers(y_pred, y_train, batch_size, self.all_train_cers)
             train_correct += train_correct_incr
             train_total += train_total_incr
+        if self.scheduler != None: 
+            self.scheduler.step()
         train_accuracy = train_correct / train_total
         # Add CER for epoch
         self.epoch_train_cers.append(round(np.mean(np.array(self.all_train_cers)), 3))
@@ -75,7 +81,7 @@ class Trainer:
             f"EPOCH {epoch + 1}/{self.epochs} - TRAINING. Correct: {train_correct}/{train_total} = {train_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_train_cers)), 3)}"
         )
 
-    def get_batch_cers(self, y_pred, y_train, batch_size):
+    def get_batch_cers(self, y_pred, y_gold, batch_size, all_cers):
         train_correct = 0
         train_total = 0
         _, max_index = torch.max(y_pred, dim=2)
@@ -94,17 +100,17 @@ class Trainer:
                 prediction_for_cer = [""]
             else:
                 prediction_for_cer = [str(pred.item()) for pred in prediction]
-            y_train_for_cer = [str(y.item()) for y in y_train[i]]
+            y_gold_for_cer = [str(y.item()) for y in y_gold[i]]
 
-            self.all_train_cers.append(
+            all_cers.append(
                 self.cer(
                     prediction_for_cer,
-                    y_train_for_cer,
+                    y_gold_for_cer,
                 ).item()
             )
 
-            if len(prediction) == len(y_train[i]) and torch.all(
-                prediction.eq(y_train[i])
+            if len(prediction) == len(y_gold[i]) and torch.all(
+                prediction.eq(y_gold[i])
             ):
                 train_correct += 1
             train_total += 1
@@ -132,16 +138,15 @@ class Trainer:
                 )
                 target_lengths = torch.IntTensor([len(t) for t in y_val])
                 self.criterion(y_pred, y_val, input_lengths, target_lengths)
-                val_correct_incr, val_total_incr = self.get_batch_cers(y_pred, y_val, batch_size)
+                val_correct_incr, val_total_incr = self.get_batch_cers(y_pred, y_val, batch_size, self.all_val_cers)
                 val_correct += val_correct_incr
                 val_total += val_total_incr
-
         val_accuracy = val_correct / val_total
         # Add CER for epoch
         self.epoch_val_cers.append(round(np.mean(np.array(self.all_val_cers)), 3))
         self.metrics["val_accuracy"].append(val_accuracy)
         print(
-            f"EPOCH {epoch + 1}/{self.epochs} - TESTING. Correct: {val_correct}/{val_total} = {val_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
+            f"EPOCH {epoch + 1}/{self.epochs} - VALIDATING. Correct: {val_correct}/{val_total} = {val_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
         )
         
     def test(self, plot_n = 1):
@@ -166,7 +171,7 @@ class Trainer:
                 )
                 target_lengths = torch.IntTensor([len(t) for t in y_test])
                 self.criterion(y_pred, y_test, input_lengths, target_lengths)
-                test_correct_incr, test_total_incr = self.get_batch_cers(y_pred, y_test, batch_size)
+                test_correct_incr, test_total_incr = self.get_batch_cers(y_pred, y_test, batch_size, self.all_test_cers)
                 test_correct += test_correct_incr
                 test_total += test_total_incr
 
