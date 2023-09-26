@@ -65,7 +65,7 @@ def get_emnist_data_loaders():
     train_set, val_set, test_set = random_split(emnist_dataset, [train_size, val_size, test_size])
 
     # Create data loaders
-    train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
-    val_loader = DataLoader(val_set, batch_size=1, shuffle=True)
-    test_loader = DataLoader(test_set, batch_size=1, shuffle=True)
+    train_loader = DataLoader(train_set, batch_size=hp.BATCH_SIZE, shuffle=True)
+    val_loader = DataLoader(val_set, batch_size=hp.BATCH_SIZE_VAL, shuffle=True)
+    test_loader = DataLoader(test_set, batch_size=hp.BATCH_SIZE_VAL, shuffle=True)
     return train_loader, val_loader, test_loader
