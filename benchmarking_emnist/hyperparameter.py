@@ -1,13 +1,20 @@
-EPOCHS = 10
-NUM_CLASSES = 11
-BLANK_LABEL = 10
-IMAGE_HEIGHT = 28
-GRU_HIDDEN_SIZE = 128
-GRU_NUM_LAYERS = 2
-CNN_OUTPUT_HEIGHT = 4
-CNN_OUTPUT_WIDTH = 32
-DIGITS_PER_SEQUENCE = 5
-NUMBER_OF_SEQUENCES = 10000
-LEARNING_RATE = 0.001
-BATCH_SIZE = 64
-BATCH_SIZE_VAL = 1
+# Common hyperparameters
+common_hyperparameters = {
+    "NUM_CLASSES": 11,
+    "BLANK_LABEL": 10,
+    "IMAGE_HEIGHT": 28,
+    "DIGITS_PER_SEQUENCE": 5,
+    "NUMBER_OF_SEQUENCES": 1000,  # 10000
+    "EPOCHS": 2,
+}
+
+# Model-specific hyperparameters
+model_specific_hyperparameters = {
+    "GRU_HIDDEN_SIZE": [128],
+    "GRU_NUM_LAYERS": [2],
+    "CNN_OUTPUT_HEIGHT": [4],
+    "CNN_OUTPUT_WIDTH": [32],
+    "LEARNING_RATE": [1e-2, 1e-3, 1e-4],
+    "BATCH_SIZE": [32, 64, 128],
+    "BATCH_SIZE_VAL": [1],
+}
