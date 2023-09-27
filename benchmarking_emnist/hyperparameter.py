@@ -11,7 +11,6 @@ NUMBER_OF_SEQUENCES = 10000
 LEARNING_RATE = 0.001
 BATCH_SIZE = 64
 BATCH_SIZE_VAL = 1
-WEIGHT_DECAY = 0.0001
 # Common hyperparameters
 common_hyperparameters = {
     "NUM_CLASSES": 11,
@@ -20,6 +19,7 @@ common_hyperparameters = {
     "DIGITS_PER_SEQUENCE": 5,
     "NUMBER_OF_SEQUENCES": 1000,  # 10000
     "EPOCHS": 2,
+    "WEIGHT_DECAY": 0.0001
 }
 
 # Model-specific hyperparameters

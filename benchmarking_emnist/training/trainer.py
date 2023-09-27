@@ -31,6 +31,8 @@ class Trainer:
             "train_accuracy": [],
             "val_loss": [],
             "val_accuracy": [],
+            "test_loss": [],
+            "test_accuracy": []
         }
         self.cer = CharErrorRate()
         self.all_train_cers = []
@@ -191,7 +193,7 @@ class Trainer:
         for i in range(x_test.shape[0]):
             raw_prediction = list(max_index[:, i].detach().cpu().numpy())
             prediction = torch.IntTensor(
-                [c for c, _ in groupby(raw_prediction) if c != self.args["BLANK_LABEL"]]
+                [c for c, _ in groupby(raw_prediction) if c != self.args["blank_label"]]
             )
             test_preds.append(prediction)
 
