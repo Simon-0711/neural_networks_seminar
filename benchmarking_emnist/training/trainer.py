@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 class Trainer:
     def __init__(
-        self, model, model_name, criterion, optimizer, train_loader, val_loader, test_loader, epochs, args, scheduler=None, model_path=None
+        self, model, model_name, criterion, optimizer, train_loader, val_loader, test_loader, epochs, args, scheduler=None, model_path=None, device = "cpu"
     ):
         self.model = model
         self.criterion = criterion
@@ -21,6 +21,7 @@ class Trainer:
         self.test_loader = test_loader
         self.epochs = epochs
         self.scheduler = scheduler
+        self.device = device
 
         self.args = args
         if model_path is not None:
@@ -57,6 +58,8 @@ class Trainer:
             file=sys.stdout,
             bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.GREEN, Fore.RESET),
         ):
+            x_train.to(self.device)
+            y_train.to(self.device)
             batch_size = x_train.shape[0]
             x_train = x_train.view(batch_size, 1, x_train.shape[1], x_train.shape[2])
             self.optimizer.zero_grad()
@@ -127,6 +130,8 @@ class Trainer:
                 file=sys.stdout,
                 bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.BLUE, Fore.RESET),
             ):
+                x_val.to(self.device)
+                y_val.to(self.device)
                 batch_size = x_val.shape[0]
                 x_val = x_val.view(batch_size, 1, x_val.shape[1], x_val.shape[2])
                 y_pred = self.model(x_val)
@@ -161,6 +166,8 @@ class Trainer:
                 file=sys.stdout,
                 bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.BLUE, Fore.RESET),
             ):
+                x_test.to(self.device)
+                y_test.to(self.device)
                 batch_size = x_test.shape[0]
                 x_test = x_test.view(batch_size, 1, x_test.shape[1], x_test.shape[2])
                 y_pred = self.model(x_test)
@@ -223,9 +230,3 @@ class Trainer:
     
     def to_device(self, device):
         self.model.to(device)
-        self.criterion.to(device)
-        self.train_loader.to(device)
-        self.val_loader.to(device)
-        self.test_loader.to(device)
-        self.scheduler.to(device)
-        self.optimizer.to(device)

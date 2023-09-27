@@ -31,5 +31,5 @@ model_specific_hyperparameters = {
     "CNN_OUTPUT_WIDTH": [32],
     "LEARNING_RATE": [1e-3, 1e-2, 1e-4],
     "BATCH_SIZE": [64, 128],
-    "BATCH_SIZE_VAL": [1],
+    "BATCH_SIZE_VAL": [64],
 }
