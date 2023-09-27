@@ -5,15 +5,22 @@ import torchvision.transforms.functional as TF
 import numpy as np
 from torchvision import datasets
 
+
 class EMNISTDataset(Dataset):
     def __init__(self, number_of_sequences, digits_per_sequence):
-        self.emnist_dataset = datasets.EMNIST('./EMNIST', split="digits", train=True, download=True)
+        self.emnist_dataset = datasets.EMNIST(
+            "./EMNIST", split="digits", train=True, download=True
+        )
         self.number_of_sequences = number_of_sequences
         self.digits_per_sequence = digits_per_sequence
-        self.transform = transforms.Compose([
-            transforms.RandomAffine(degrees=10, translate=(0.2, 0.15), scale=(0.8, 1.1)),
-            transforms.ToTensor()
-        ])
+        self.transform = transforms.Compose(
+            [
+                transforms.RandomAffine(
+                    degrees=10, translate=(0.2, 0.15), scale=(0.8, 1.1)
+                ),
+                transforms.ToTensor(),
+            ]
+        )
         self.data, self.labels = self.prepare_data()
 
     def __len__(self):
@@ -27,7 +34,9 @@ class EMNISTDataset(Dataset):
         dataset_labels = []
 
         for i in range(self.number_of_sequences):
-            random_indices = np.random.randint(len(self.emnist_dataset.data), size=(self.digits_per_sequence,))
+            random_indices = np.random.randint(
+                len(self.emnist_dataset.data), size=(self.digits_per_sequence,)
+            )
             random_digits_images = self.emnist_dataset.data[random_indices]
             transformed_random_digits_images = []
 
@@ -40,8 +49,12 @@ class EMNISTDataset(Dataset):
 
             random_digits_images = np.array(transformed_random_digits_images)
             random_digits_labels = self.emnist_dataset.targets[random_indices]
-            random_sequence = np.hstack(random_digits_images.reshape((self.digits_per_sequence, 28, 28)))
-            random_labels = np.hstack(random_digits_labels.reshape(self.digits_per_sequence, 1))
+            random_sequence = np.hstack(
+                random_digits_images.reshape((self.digits_per_sequence, 28, 28))
+            )
+            random_labels = np.hstack(
+                random_digits_labels.reshape(self.digits_per_sequence, 1)
+            )
             dataset_sequences.append(random_sequence / 255)
             dataset_labels.append(random_labels)
 
@@ -53,19 +66,25 @@ class EMNISTDataset(Dataset):
 
 # Create the EMNIST dataset
 from torch.utils.data import DataLoader, random_split
-import hyperparameter as hp
 
-def get_emnist_data_loaders():
-    emnist_dataset = EMNISTDataset(hp.NUMBER_OF_SEQUENCES, hp.DIGITS_PER_SEQUENCE)
+
+def get_emnist_data_loaders(
+    number_of_sequences, digits_per_sequence, batch_size, batch_size_val
+):
+    emnist_dataset = EMNISTDataset(
+        number_of_sequences=number_of_sequences, digits_per_sequence=digits_per_sequence
+    )
 
     # Split the dataset into train and validation sets
     train_size = int(0.7 * len(emnist_dataset))
     val_size = int(len(emnist_dataset) - train_size - 0.1)
     test_size = int(len(emnist_dataset) - train_size - val_size)
-    train_set, val_set, test_set = random_split(emnist_dataset, [train_size, val_size, test_size])
+    train_set, val_set, test_set = random_split(
+        emnist_dataset, [train_size, val_size, test_size]
+    )
 
     # Create data loaders
-    train_loader = DataLoader(train_set, batch_size=hp.BATCH_SIZE, shuffle=True)
-    val_loader = DataLoader(val_set, batch_size=hp.BATCH_SIZE_VAL, shuffle=True)
-    test_loader = DataLoader(test_set, batch_size=hp.BATCH_SIZE_VAL, shuffle=True)
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_set, batch_size=batch_size_val, shuffle=True)
+    test_loader = DataLoader(test_set, batch_size=batch_size_val, shuffle=True)
     return train_loader, val_loader, test_loader

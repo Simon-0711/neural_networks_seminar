@@ -5,9 +5,9 @@ from colorama import Fore
 from itertools import groupby
 from torchmetrics.text import CharErrorRate
 import numpy as np
-import hyperparameter as hp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+
 
 class Trainer:
     def __init__(
@@ -88,11 +88,7 @@ class Trainer:
         for i in range(batch_size):
             raw_prediction = list(max_index[:, i].detach().cpu().numpy())
             prediction = torch.IntTensor(
-                [
-                    c
-                    for c, _ in groupby(raw_prediction)
-                    if c != self.args["blank_label"]
-                ]
+                [c for c, _ in groupby(raw_prediction) if c != self.args["blank_label"]]
             )
 
             # check if predictions are empty and generate str list
@@ -148,8 +144,8 @@ class Trainer:
         print(
             f"EPOCH {epoch + 1}/{self.epochs} - VALIDATING. Correct: {val_correct}/{val_total} = {val_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
         )
-        
-    def test(self, plot_n = 1):
+
+    def test(self, plot_n=1):
         # Validation
         test_correct = 0
         test_total = 0
@@ -182,19 +178,21 @@ class Trainer:
         print(
             f"TESTING. Correct: {test_correct}/{test_total} = {test_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
         )
-        
-
 
         test_preds = []
         (x_test, y_test) = next(iter(self.train_loader))
-        y_pred = self.model(x_test.view(x_test.shape[0], 1, x_test.shape[1], x_test.shape[2]))
+        y_pred = self.model(
+            x_test.view(x_test.shape[0], 1, x_test.shape[1], x_test.shape[2])
+        )
 
         # Prepare plotting results
         y_pred = y_pred.permute(1, 0, 2)
         _, max_index = torch.max(y_pred, dim=2)
         for i in range(x_test.shape[0]):
             raw_prediction = list(max_index[:, i].detach().cpu().numpy())
-            prediction = torch.IntTensor([c for c, _ in groupby(raw_prediction) if c != hp.BLANK_LABEL])
+            prediction = torch.IntTensor(
+                [c for c, _ in groupby(raw_prediction) if c != self.args["BLANK_LABEL"]]
+            )
             test_preds.append(prediction)
 
         for j in range(len(x_test)):
@@ -202,12 +200,11 @@ class Trainer:
                 break
 
             mpl.rcParams["font.size"] = 8
-            plt.imshow(x_test[j], cmap='gray')
+            plt.imshow(x_test[j], cmap="gray")
             mpl.rcParams["font.size"] = 18
             plt.gcf().text(x=0.1, y=0.1, s="Actual: " + str(y_test[j].numpy()))
             plt.gcf().text(x=0.1, y=0.2, s="Predicted: " + str(test_preds[j].numpy()))
             plt.show()
-
 
     def train_validate_test(self):
         for epoch in range(self.epochs):
