@@ -68,11 +68,7 @@ class Trainer:
         train_total = 0
         self.model.train()
         for x_train, y_train in tqdm(
-            self.train_loader,
-            position=0,
-            leave=True,
-            file=sys.stdout,
-            bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.GREEN, Fore.RESET),
+            self.train_loader
         ):
             x_train.to(self.device)
             y_train.to(self.device)
@@ -105,7 +101,7 @@ class Trainer:
         self.metrics["train_loss"].append(loss.item())
         self.metrics["train_accuracy"].append(train_accuracy)
         print(
-            f"EPOCH {epoch + 1}/{self.epochs} - TRAINING. Loss: {loss.item()} - Correct: {train_correct}/{train_total} = {train_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_train_cers)), 3)}"
+            f"Training Epoch: {epoch + 1}/{self.epochs}; Loss: {loss.item()}; Correct: {train_correct}/{train_total} = {train_accuracy:.4f}; Average CER Score: {round(np.mean(np.array(self.all_train_cers)), 3)}"
         )
 
     def get_batch_cers(self, y_pred, y_gold, batch_size, all_cers):
@@ -146,11 +142,7 @@ class Trainer:
         self.model.eval()
         with torch.no_grad():
             for x_val, y_val in tqdm(
-                self.val_loader,
-                position=0,
-                leave=True,
-                file=sys.stdout,
-                bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.BLUE, Fore.RESET),
+                self.val_loader
             ):
                 x_val.to(self.device)
                 y_val.to(self.device)
@@ -174,21 +166,17 @@ class Trainer:
         self.metrics["val_accuracy"].append(val_accuracy)
         self.metrics["val_loss"].append(loss.item())
         print(
-            f"EPOCH {epoch + 1}/{self.epochs} - VALIDATING. Loss: {loss.item()} -  Correct: {val_correct}/{val_total} = {val_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
+            f"Validate Epoch: {epoch + 1}/{self.epochs}; Loss: {loss.item()}; Correct: {val_correct}/{val_total} = {val_accuracy:.4f}; Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
         )
 
-    def test(self, plot_n=1):
+    def test(self, plot_n=1, plot=False):
         # Testing
         test_correct = 0
         test_total = 0
         self.model.eval()
         with torch.no_grad():
             for x_test, y_test in tqdm(
-                self.test_loader,
-                position=0,
-                leave=True,
-                file=sys.stdout,
-                bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.RED, Fore.RESET),
+                self.test_loader
             ):
                 x_test.to(self.device)
                 y_test.to(self.device)
@@ -214,35 +202,41 @@ class Trainer:
         self.metrics["test_loss"].append(loss.item())
 
         print(
-            f"TESTING. Loss: {loss.item()} -  Correct: {test_correct}/{test_total} = {test_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
+            f"\033[91mTest Predictions --> Loss: {loss.item()}; Correct: {test_correct}/{test_total} = {test_accuracy:.4f}; Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}\033[0m"
         )
 
-        test_preds = []
-        (x_test, y_test) = next(iter(self.train_loader))
-        y_pred = self.model(
-            x_test.view(x_test.shape[0], 1, x_test.shape[1], x_test.shape[2])
-        )
-
-        # Prepare plotting results
-        y_pred = y_pred.permute(1, 0, 2)
-        _, max_index = torch.max(y_pred, dim=2)
-        for i in range(x_test.shape[0]):
-            raw_prediction = list(max_index[:, i].detach().cpu().numpy())
-            prediction = torch.IntTensor(
-                [c for c, _ in groupby(raw_prediction) if c != self.args["blank_label"]]
+        if plot:
+            test_preds = []
+            (x_test, y_test) = next(iter(self.train_loader))
+            y_pred = self.model(
+                x_test.view(x_test.shape[0], 1, x_test.shape[1], x_test.shape[2])
             )
-            test_preds.append(prediction)
 
-        for j in range(len(x_test)):
-            if j == plot_n:
-                break
+            # Prepare plotting results
+            y_pred = y_pred.permute(1, 0, 2)
+            _, max_index = torch.max(y_pred, dim=2)
+            for i in range(x_test.shape[0]):
+                raw_prediction = list(max_index[:, i].detach().cpu().numpy())
+                prediction = torch.IntTensor(
+                    [c for c, _ in groupby(raw_prediction) if c != self.args["blank_label"]]
+                )
+                test_preds.append(prediction)
 
-            mpl.rcParams["font.size"] = 8
-            plt.imshow(x_test[j], cmap="gray")
-            mpl.rcParams["font.size"] = 18
-            plt.gcf().text(x=0.1, y=0.1, s="Actual: " + str(y_test[j].numpy()))
-            plt.gcf().text(x=0.1, y=0.2, s="Predicted: " + str(test_preds[j].numpy()))
-            plt.show()
+            for j in range(len(x_test)):
+                if j == plot_n:
+                    break
+                print("Test Sample: " + str(j + 1))
+                print("Gold Label: " + str(y_test[j].numpy()))
+                print("Model Output: " + str(test_preds[j].numpy()))
+                mpl.rcParams["font.size"] = 6
+                mpl.rcParams["font.size"] = 10
+                plt.imshow(x_test[j], cmap="gray")
+                plt.show()
+
+                # plt.gcf().text(x=0.1, y=0.1, s="Gold Label: " + str(y_test[j].numpy()) + ";  Model Output: " + str(test_preds[j].numpy()))
+
+    def predictions_to_string(predictions, label_map):
+        return ''.join([label_map[c] for c in predictions])
 
     def train_validate_test(self):
         for epoch in range(self.epochs):
