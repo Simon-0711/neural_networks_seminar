@@ -4,7 +4,7 @@ common_hyperparameters = {
     "BLANK_LABEL": 10,
     "IMAGE_HEIGHT": 28,
     "DIGITS_PER_SEQUENCE": 5,
-    "NUMBER_OF_SEQUENCES": 5000,  # 10000
+    "NUMBER_OF_SEQUENCES": 10000,
     "EPOCHS": 10,
     "WEIGHT_DECAY": 0.0001,
 }

@@ -57,7 +57,7 @@ def plot_loss(
     plt.plot(epochs, val_loss_per_epoch, label="Validation Loss")
 
     # Add information
-    plt.title(f"Training and Validation Loss after Epoch for {model_name} model")
+    plt.title(f"Training and Validation Loss after Epoch")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.xticks(np.arange(0, stop_x_tick, tick_interval))
