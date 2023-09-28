@@ -11,7 +11,19 @@ import matplotlib.pyplot as plt
 
 class Trainer:
     def __init__(
-        self, model, model_name, criterion, optimizer, train_loader, val_loader, test_loader, epochs, args, scheduler=None, model_path=None, device = "cpu"
+        self,
+        model,
+        model_name,
+        criterion,
+        optimizer,
+        train_loader,
+        val_loader,
+        test_loader,
+        epochs,
+        args,
+        scheduler=None,
+        model_path=None,
+        device="cpu",
     ):
         self.model = model
         self.criterion = criterion
@@ -27,21 +39,25 @@ class Trainer:
         if model_path is not None:
             self.model.load_state_dict(torch.load(model_path))
 
+        # After epoch
         self.metrics = {
             "train_loss": [],
             "train_accuracy": [],
+            "train_cer": [],
             "val_loss": [],
             "val_accuracy": [],
+            "val_cer": [],
             "test_loss": [],
-            "test_accuracy": []
+            "test_accuracy": [],
+            "test_cer": [],
         }
         self.cer = CharErrorRate()
         self.all_train_cers = []
         self.all_val_cers = []
         self.all_test_cers = []
-        self.epoch_train_cers = []
-        self.epoch_val_cers = []
-        self.epoch_test_cers = []
+        # self.epoch_train_cers = []
+        # self.epoch_val_cers = []
+        # self.epoch_test_cers = []
 
     def load_model(self, model_path):
         self.model.load_state_dict(torch.load(model_path))
@@ -72,18 +88,24 @@ class Trainer:
             loss = self.criterion(y_pred, y_train, input_lengths, target_lengths)
             loss.backward()
             self.optimizer.step()
-            train_correct_incr, train_total_incr = self.get_batch_cers(y_pred, y_train, batch_size, self.all_train_cers)
+            train_correct_incr, train_total_incr = self.get_batch_cers(
+                y_pred, y_train, batch_size, self.all_train_cers
+            )
             train_correct += train_correct_incr
             train_total += train_total_incr
-        if self.scheduler != None: 
+
+        if self.scheduler != None:
             self.scheduler.step()
         train_accuracy = train_correct / train_total
+
         # Add CER for epoch
-        self.epoch_train_cers.append(round(np.mean(np.array(self.all_train_cers)), 3))
+        self.metrics["train_cer"].append(
+            round(np.mean(np.array(self.all_train_cers)), 3)
+        )
         self.metrics["train_loss"].append(loss.item())
         self.metrics["train_accuracy"].append(train_accuracy)
         print(
-            f"EPOCH {epoch + 1}/{self.epochs} - TRAINING. Correct: {train_correct}/{train_total} = {train_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_train_cers)), 3)}"
+            f"EPOCH {epoch + 1}/{self.epochs} - TRAINING. Loss: {loss.item()} - Correct: {train_correct}/{train_total} = {train_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_train_cers)), 3)}"
         )
 
     def get_batch_cers(self, y_pred, y_gold, batch_size, all_cers):
@@ -141,16 +163,18 @@ class Trainer:
                 )
                 target_lengths = torch.IntTensor([len(t) for t in y_val])
                 loss = self.criterion(y_pred, y_val, input_lengths, target_lengths)
-                val_correct_incr, val_total_incr = self.get_batch_cers(y_pred, y_val, batch_size, self.all_val_cers)
+                val_correct_incr, val_total_incr = self.get_batch_cers(
+                    y_pred, y_val, batch_size, self.all_val_cers
+                )
                 val_correct += val_correct_incr
                 val_total += val_total_incr
         val_accuracy = val_correct / val_total
         # Add CER for epoch
-        self.epoch_val_cers.append(round(np.mean(np.array(self.all_val_cers)), 3))
+        self.metrics["val_cer"].append(round(np.mean(np.array(self.all_val_cers)), 3))
         self.metrics["val_accuracy"].append(val_accuracy)
         self.metrics["val_loss"].append(loss.item())
         print(
-            f"EPOCH {epoch + 1}/{self.epochs} - VALIDATING. Correct: {val_correct}/{val_total} = {val_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
+            f"EPOCH {epoch + 1}/{self.epochs} - VALIDATING. Loss: {loss.item()} -  Correct: {val_correct}/{val_total} = {val_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
         )
 
     def test(self, plot_n=1):
@@ -164,7 +188,7 @@ class Trainer:
                 position=0,
                 leave=True,
                 file=sys.stdout,
-                bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.BLUE, Fore.RESET),
+                bar_format="{l_bar}%s{bar}%s{r_bar}" % (Fore.RED, Fore.RESET),
             ):
                 x_test.to(self.device)
                 y_test.to(self.device)
@@ -177,18 +201,20 @@ class Trainer:
                 )
                 target_lengths = torch.IntTensor([len(t) for t in y_test])
                 loss = self.criterion(y_pred, y_test, input_lengths, target_lengths)
-                test_correct_incr, test_total_incr = self.get_batch_cers(y_pred, y_test, batch_size, self.all_test_cers)
+                test_correct_incr, test_total_incr = self.get_batch_cers(
+                    y_pred, y_test, batch_size, self.all_test_cers
+                )
                 test_correct += test_correct_incr
                 test_total += test_total_incr
 
         test_accuracy = test_correct / test_total
         # Add CER for epoch
-        self.epoch_test_cers.append(round(np.mean(np.array(self.all_test_cers)), 3))
+        self.metrics["test_cer"].append(round(np.mean(np.array(self.all_test_cers)), 3))
         self.metrics["test_accuracy"].append(test_accuracy)
         self.metrics["test_loss"].append(loss.item())
 
         print(
-            f"TESTING. Correct: {test_correct}/{test_total} = {test_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
+            f"TESTING. Loss: {loss.item()} -  Correct: {test_correct}/{test_total} = {test_accuracy:.4f} - Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}"
         )
 
         test_preds = []
@@ -223,10 +249,10 @@ class Trainer:
             self.train(epoch)
             self.validate(epoch)
         self.test()
-        self.metrics["train_cer"] = self.all_train_cers
-        self.metrics["val_cer"] = self.all_val_cers
-        self.metrics["test_cer"] = self.all_test_cers
+        # self.metrics["train_cer"] = self.epoch_train_cers
+        # self.metrics["val_cer"] = self.epoch_val_cers
+        # self.metrics["test_cer"] = self.epoch_test_cers
         return self.metrics
-    
+
     def to_device(self, device):
         self.model.to(device)
