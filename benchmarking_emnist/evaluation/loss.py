@@ -53,11 +53,11 @@ def plot_loss(
     plt.figure(figsize=(12, 6), dpi=100)
 
     # Add data
-    plt.plot(epochs, train_loss_per_epoch, label="Train Loss after each epoch")
-    plt.plot(epochs, val_loss_per_epoch, label="Validation Loss after each epoch")
+    plt.plot(epochs, train_loss_per_epoch, label="Train Loss")
+    plt.plot(epochs, val_loss_per_epoch, label="Validation Loss")
 
     # Add information
-    plt.title(f"Training and Validation Loss per Epoch for {model_name} model")
+    plt.title(f"Training and Validation Loss after Epoch for {model_name} model")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.xticks(np.arange(0, stop_x_tick, tick_interval))
@@ -130,11 +130,11 @@ def plot_multiple_losses(
         plt.plot(
             epochs,
             train_loss_per_epoch,
-            label=f"Train Loss after each epoch for model {model_name}",
+            label=f"Model number {model_name}",
         )
 
     # Add information
-    plt.title(f"Training Loss per Epoch for Top 5 Grid Search Models")
+    plt.title(f"Training Loss after Epoch for Top 5 Grid Search Models")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.xticks(np.arange(0, stop_x_tick, tick_interval))
@@ -155,11 +155,11 @@ def plot_multiple_losses(
         plt.plot(
             epochs,
             val_loss_per_epoch,
-            label=f"Validation Loss after each epoch  for model {model_name}",
+            label=f"Model number {model_name}",
         )
 
     # Add information
-    plt.title(f"Validation Loss per Epoch for Top 5 Grid Search Models")
+    plt.title(f"Validation Loss after Epoch for Top 5 Grid Search Models")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.xticks(np.arange(0, stop_x_tick, tick_interval))
