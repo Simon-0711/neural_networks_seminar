@@ -63,6 +63,7 @@ class Trainer:
 
     def train(self, epoch):
         # Training
+        self.model.eval()
         train_correct = 0
         train_total = 0
         self.model.train()
@@ -201,7 +202,7 @@ class Trainer:
         self.metrics["test_loss"].append(loss.item())
 
         print(
-            f"\033[91mTest Predictions --> Loss: {loss.item()}; Correct: {test_correct}/{test_total} = {test_accuracy:.4f}; Average CER Score: {round(np.mean(np.array(self.all_val_cers)), 3)}\033[0m"
+            f"\033[91mTest Predictions --> Loss: {loss.item()}; Correct: {test_correct}/{test_total} = {test_accuracy:.4f}; Average CER Score: {round(np.mean(np.array(self.all_test_cers)), 3)}\033[0m"
         )
 
         if plot:
