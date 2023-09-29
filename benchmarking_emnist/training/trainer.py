@@ -1,7 +1,6 @@
 import sys
 import torch
 from tqdm import tqdm
-from colorama import Fore
 from itertools import groupby
 from torchmetrics.text import CharErrorRate
 import numpy as np

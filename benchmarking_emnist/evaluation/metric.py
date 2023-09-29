@@ -77,7 +77,8 @@ def plot_multiple_metrics(
     train_metrics_list: list,
     val_metrics_list: list,
     figure_evaluation_dir=None,
-    metric_name="Loss"
+    metric_name="Loss",
+    model_name = ""
 ):
     """
     Plots the training and validation metric per epoch for multiple models.
@@ -147,7 +148,7 @@ def plot_multiple_metrics(
     plt.legend(loc="best")
 
     # Save the plot
-    plot_path = f"{figure_evaluation_dir}top_5_models_training_{metric_file_name}.png"
+    plot_path = f"{figure_evaluation_dir}top_5_models_training_{metric_file_name}_{model_name}.png"
     plt.savefig(plot_path)
     plt.clf()
 
@@ -172,6 +173,6 @@ def plot_multiple_metrics(
     plt.legend(loc="best")
 
     # Save the plot
-    plot_path = f"{figure_evaluation_dir}top_5_models_validation {metric_file_name}.png"
+    plot_path = f"{figure_evaluation_dir}top_5_models_validation {metric_file_name}_{model_name}.png"
     plt.savefig(plot_path)
     plt.clf()
