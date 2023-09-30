@@ -228,3 +228,10 @@ model_exploration/easy_ocr/Icon
 model_exploration/test_images/Icon
 custom_ocr_cnn_lstm/EMNIST/EMNIST/raw/gzip.zip
 model_exploration/test_images/Icon
+!/Icon**
+!/data_exploration/Icon**
+!/model_exploration/easy_ocr/Icon**
+!/model_exploration/Icon**
+!/model_exploration/test_images/Icon**
+!/model_exploration/transformer_ocr_microsoft/Icon**
+
