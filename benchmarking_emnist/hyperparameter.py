@@ -5,9 +5,7 @@ common_hyperparameters = {
     "IMAGE_HEIGHT": 28,
     "DIGITS_PER_SEQUENCE": 5,
     "NUMBER_OF_SEQUENCES": 10000,
-    # "NUMBER_OF_SEQUENCES": 1000,
     "EPOCHS": 10,
-    # "EPOCHS": 1,
     "WEIGHT_DECAY": 0.0001,
 }
 
