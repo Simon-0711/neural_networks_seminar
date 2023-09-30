@@ -167,7 +167,8 @@ cython_debug/
 
 # Data
 data/**
-
+EMNIST/**
+benchmarking_emnist/EMNIST/**
 
 .env
 # Ignore downloaded training data
@@ -235,3 +236,5 @@ model_exploration/test_images/Icon
 !/model_exploration/test_images/Icon**
 !/model_exploration/transformer_ocr_microsoft/Icon**
 
+**.pth
+**.png
